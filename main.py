@@ -24,7 +24,7 @@ def Detect_Eye(eye):
 
 
 # Thresholds for drowsiness detection
-EAR_THRESHOLD = 0.2  # Adjust as needed
+EAR_THRESHOLD = 0.3 # Adjust as needed
 CONSECUTIVE_FRAMES_THRESHOLD = 3  # Adjust as needed
 frame_counter = 0
 
@@ -81,8 +81,8 @@ while True:
                             cv2.FONT_HERSHEY_PLAIN, 2, (21, 56, 212), 3)
 
                 # Alert the person
-                engine.say("ALERT! ALERT! ALERT!")
-                engine.runAndWait()
+                print("warning drowsy")
+
         else:
             frame_counter = 0
 
