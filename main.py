@@ -4,14 +4,11 @@ import pyttsx3
 from scipy.spatial import distance
 
 # Initialize pyttsx3 for alert audio
-engine = pyttsx3.init()
-
-# Set up the camera (0 or 1 for the camera index)
+engine = pyttsx3.init()# Set up the camera (0 or 1 for the camera index)
 cap = cv2.VideoCapture(0)
-
 # Load face detector and landmarks predictor
 face_detector = dlib.get_frontal_face_detector()
-dlib_facelandmark = dlib.shape_predictor("/Users/unmesh/Downloads/shape_predictor_68_face_landmarks.dat")
+dlib_facelandmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 
 # Function to calculate the aspect ratio for the eyes
@@ -23,8 +20,8 @@ def Detect_Eye(eye):
     return aspect_ratio_Eye
 
 
-# Thresholds for drowsiness detection
-EAR_THRESHOLD = 0.3 # Adjust as needed
+# Initialize dynamic threshold variables
+baseline_EAR = None
 CONSECUTIVE_FRAMES_THRESHOLD = 3  # Adjust as needed
 frame_counter = 0
 
@@ -40,8 +37,7 @@ while True:
         leftEye = []
         rightEye = []
 
-        # THESE ARE THE POINTS ALLOCATION FOR THE
-        # LEFT EYES IN .DAT FILE THAT ARE FROM 42 TO 47
+        # Points allocation for the left eyes in .DAT file (42 to 47)
         for n in range(42, 48):
             x = face_landmarks.part(n).x
             y = face_landmarks.part(n).y
@@ -53,8 +49,7 @@ while True:
             y2 = face_landmarks.part(next_point).y
             cv2.line(frame, (x, y), (x2, y2), (0, 255, 0), 1)
 
-        # THESE ARE THE POINTS ALLOCATION FOR THE
-        # RIGHT EYES IN .DAT FILE THAT ARE FROM 36 TO 41
+        # Points allocation for the right eyes in .DAT file (36 to 41)
         for n in range(36, 42):
             x = face_landmarks.part(n).x
             y = face_landmarks.part(n).y
@@ -71,8 +66,15 @@ while True:
         left_Eye = Detect_Eye(leftEye)
         Eye_Rat = (left_Eye + right_Eye) / 2
 
+        # Update baseline_EAR if it's None (first frame)
+        if baseline_EAR is None:
+            baseline_EAR = Eye_Rat
+
+        # Calculate dynamic threshold as a percentage of baseline_EAR
+        threshold = baseline_EAR * 0.8  # Adjust the percentage as needed
+
         # Adjust the threshold based on your testing
-        if Eye_Rat < EAR_THRESHOLD:
+        if Eye_Rat < threshold:
             frame_counter += 1
             if frame_counter >= CONSECUTIVE_FRAMES_THRESHOLD:
                 cv2.putText(frame, "DROWSINESS DETECTED", (50, 100),
@@ -83,6 +85,8 @@ while True:
                 # Alert the person
                 print("warning drowsy")
 
+
+
         else:
             frame_counter = 0
 
@@ -91,3 +95,6 @@ while True:
     if key == 27:  # Press 'Esc' to exit the loop
         break
 
+# Release the camera and close all windows
+cap.release()
+cv2.destroyAllWindows()
