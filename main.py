@@ -2,6 +2,7 @@ import cv2
 import dlib
 import pyttsx3
 from scipy.spatial import distance
+import socket
 
 # Initialize pyttsx3 for alert audio
 engine = pyttsx3.init()# Set up the camera (0 or 1 for the camera index)
@@ -10,6 +11,9 @@ cap = cv2.VideoCapture(0)
 face_detector = dlib.get_frontal_face_detector()
 dlib_facelandmark = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
+# Set up the socket connection
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(('localhost', 12345))  # Change the IP address and port as needed
 
 # Function to calculate the aspect ratio for the eyes
 def Detect_Eye(eye):
@@ -22,7 +26,7 @@ def Detect_Eye(eye):
 
 # Initialize dynamic threshold variables
 baseline_EAR = None
-CONSECUTIVE_FRAMES_THRESHOLD = 3  # Adjust as needed
+CONSECUTIVE_FRAMES_THRESHOLD = 2  # Adjust as needed
 frame_counter = 0
 
 while True:
@@ -81,14 +85,12 @@ while True:
                             cv2.FONT_HERSHEY_PLAIN, 2, (21, 56, 210), 3)
                 cv2.putText(frame, "ALERT", (50, 450),
                             cv2.FONT_HERSHEY_PLAIN, 2, (21, 56, 212), 3)
-
-                # Alert the person
-                print("warning drowsy")
-
-
-
+                s.send(b'Drowsy')  # Send the drowsy flag over the socket
+                print("Driver is drowsy!")  # Print for debugging
+                frame_counter = 0
         else:
             frame_counter = 0
+            s.send(b'Not drowsy')  # Send the not drowsy flag over the socket
 
     cv2.imshow("Drowsiness DETECTOR IN OPENCV2", frame)
     key = cv2.waitKey(1)  # Adjust the delay as needed
