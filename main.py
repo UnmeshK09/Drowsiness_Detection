@@ -85,12 +85,12 @@ while True:
                             cv2.FONT_HERSHEY_PLAIN, 2, (21, 56, 210), 3)
                 cv2.putText(frame, "ALERT", (50, 450),
                             cv2.FONT_HERSHEY_PLAIN, 2, (21, 56, 212), 3)
-                s.send(b'Drowsy')  # Send the drowsy flag over the socket
+                s.send(b'1')  # Send the drowsy flag over the socket
                 print("Driver is drowsy!")  # Print for debugging
                 frame_counter = 0
         else:
             frame_counter = 0
-            s.send(b'Not drowsy')  # Send the not drowsy flag over the socket
+            s.send(b'0')  # Send the not drowsy flag over the socket
 
     cv2.imshow("Drowsiness DETECTOR IN OPENCV2", frame)
     key = cv2.waitKey(1)  # Adjust the delay as needed

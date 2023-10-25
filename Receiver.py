@@ -7,15 +7,14 @@ s.listen(5)
 client_socket, addr = s.accept()
 print(f"Connection from {addr} has been established!")
 
-
 while True:
     flag = client_socket.recv(1024)  # Receive the flag over the socket
     received_flag = flag.decode('utf-8')  # Decode the received flag
     print("Received Flag:", received_flag)  # Debug print statement
-    if received_flag == 'Drowsy':
+    if received_flag == '1':
         # Perform some action when the drowsy flag is received
         print("Driver is drowsy!")
-    elif received_flag == 'Not drowsy':
+    elif received_flag == '0':
         # Perform some action when the not drowsy flag is received
         print("Driver is not drowsy!")
     else:
